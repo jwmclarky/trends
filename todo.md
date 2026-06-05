@@ -1,0 +1,38 @@
+# KinkMetrics TODO
+
+- [x] Dark theme setup with elegant typography and color palette
+- [x] Database schema: trends, articles, profiles, forum posts, chat messages
+- [x] Seed curated trend data (Pornhub Insights, Clips4Sale, Reddit sources)
+- [x] Public landing page with hero, live trend highlights, featured articles, CTAs
+- [x] Interactive data dashboard with filterable charts (country, demographics, time)
+- [x] Bar charts, heatmaps, world map, and trend line visualizations
+- [x] Blog section with 12+ long-form articles
+- [x] User authentication via Manus OAuth (login/logout/session)
+- [x] Member profile pages with bio, avatar upload, personal stats
+- [x] Image upload capability for member profiles
+- [x] Members-only forum with threaded posts, categories, upvoting
+- [x] Real-time member chat feature
+- [x] Downloadable infographic image summarizing key data
+- [x] Responsive mobile-first layout with smooth animations
+- [x] Navigation system (public nav + authenticated member nav)
+- [x] AI Trend Analyst: LLM-powered assistant for natural-language data summaries and suggestions
+- [x] AI Infographic Generator: On-demand custom infographic creation from dashboard filters
+- [x] New Member & Activity Alerts: Owner notifications for registrations, engagement spikes, trending data
+- [x] Nocturne theme implementation (dark, elegant, refined aesthetic)
+- [x] Add time-period filter to dashboard (year/quarter selector)
+- [x] Add trend line chart visualization to dashboard
+- [x] Implement public profile lookup by user ID for /profile/:id
+- [x] Add image upload validation (size limits, MIME checking)
+- [x] Upgrade chat polling to shorter interval with optimistic updates
+- [x] In-app notifications table (userId, type, message, link, isRead, createdAt)
+- [x] Notification triggers: forum reply, upvote received, new chat message
+- [x] Notification bell in nav with unread badge count
+- [x] Notification center dropdown with mark-as-read and mark-all-read
+- [x] Auto-polling for new notifications (every 10s for logged-in users)
+- [x] Seed XHamster and YouPorn annual report data (~52 new records)
+- [x] Fix Trending Now to sort by 2025 recency + growthPercent DESC
+- [x] Build Compare Two Kinks page with side-by-side charts
+- [x] Seed 2 new Gemini blog articles into database
+- [x] Build Making Porn Toolkit section with 8 tools/guides
+- [x] Build External Reading List page (25 articles)
+- [x] Wire Toolkit and Reading List into navigation

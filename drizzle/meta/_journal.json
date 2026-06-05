@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1779159020568,
+      "tag": "0000_hot_cable",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779159214390,
+      "tag": "0001_fearless_madrox",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779162883231,
+      "tag": "0002_perpetual_post",
+      "breakpoints": true
+    }
+  ]
+}
