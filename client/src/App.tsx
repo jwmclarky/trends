@@ -27,7 +27,16 @@ import Legality from "./pages/Legality";
 import BountyBoard from "./pages/BountyBoard";
 import RopeStudio from "./pages/RopeStudio";
 import PlatformMatrix from "./pages/PlatformMatrix";
-
+import ConceptGenerator from "./pages/ConceptGenerator";
+import DirectMessages from "./pages/DirectMessages";
+import DMCARadar from "./pages/DMCARadar";
+import SentimentDashboard from "./pages/SentimentDashboard";
+import CollabHub from "./pages/CollabHub";
+import Leaderboard from "./pages/Leaderboard";
+import TrendForecasting from "./pages/TrendForecasting";
+import Scheduler from "./pages/Scheduler";
+import FanPolls from "./pages/FanPolls";
+import TaxSandbox from "./pages/TaxSandbox";
 
 function Router() {
   return (
@@ -41,6 +50,16 @@ function Router() {
       <Route path="/bounties" component={BountyBoard} />
       <Route path="/rope-studio" component={RopeStudio} />
       <Route path="/platform-matrix" component={PlatformMatrix} />
+      <Route path="/concept-generator" component={ConceptGenerator} />
+      <Route path="/direct-messages" component={DirectMessages} />
+      <Route path="/dmca" component={DMCARadar} />
+      <Route path="/sentiment" component={SentimentDashboard} />
+      <Route path="/collab" component={CollabHub} />
+      <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/trend-forecasting" component={TrendForecasting} />
+      <Route path="/scheduler" component={Scheduler} />
+      <Route path="/fan-polls" component={FanPolls} />
+      <Route path="/tax-sandbox" component={TaxSandbox} />
       <Route path="/kink-matcher" component={KinkMatcher} />
       <Route path="/vault" component={Vault} />
       <Route path="/blog" component={Blog} />

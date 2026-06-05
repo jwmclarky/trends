@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
-import { BarChart3, BookOpen, MessageCircle, Users, TrendingUp, Menu, X, Download, Database, GitCompare, Wrench, BookMarked, Heart, Lock, Calculator, Sparkles, Scale, Briefcase, Activity } from "lucide-react";
+import { BarChart3, BookOpen, MessageCircle, Users, TrendingUp, Menu, X, Download, Database, GitCompare, Wrench, BookMarked, Heart, Lock, Calculator, Sparkles, Scale, Briefcase, Activity, Lightbulb, Shield, LineChart, Calendar, Vote, Send, FileText, Award } from "lucide-react";
 import { useState } from "react";
 import NotificationBell from "@/components/NotificationBell";
 
@@ -29,6 +29,16 @@ export default function Navigation() {
     { href: "/bounties", label: "Bounty Board", icon: Briefcase },
     { href: "/rope-studio", label: "Rope Studio", icon: Activity },
     { href: "/platform-matrix", label: "Platform Matrix", icon: GitCompare },
+    { href: "/concept-generator", label: "Concept Gen", icon: Lightbulb },
+    { href: "/direct-messages", label: "Direct Msgs", icon: Send },
+    { href: "/dmca", label: "DMCA Radar", icon: Shield },
+    { href: "/sentiment", label: "Sentiment", icon: Heart },
+    { href: "/collab", label: "Collab Hub", icon: Users },
+    { href: "/leaderboard", label: "Leaderboard", icon: Award },
+    { href: "/trend-forecasting", label: "Forecasting", icon: LineChart },
+    { href: "/scheduler", label: "Scheduler", icon: Calendar },
+    { href: "/fan-polls", label: "Fan Polls", icon: Vote },
+    { href: "/tax-sandbox", label: "Tax Sandbox", icon: FileText },
     { href: "/forum", label: "Forum", icon: Users },
     { href: "/chat", label: "Chat", icon: MessageCircle },
   ];

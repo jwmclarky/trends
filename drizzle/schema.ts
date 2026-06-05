@@ -141,3 +141,73 @@ export type VaultComment = typeof vaultComments.$inferSelect;
 export type InsertVaultComment = typeof vaultComments.$inferInsert;
 export type Bounty = typeof bounties.$inferSelect;
 export type InsertBounty = typeof bounties.$inferInsert;
+
+export const directMessages = mysqlTable("direct_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  senderId: int("senderId").notNull(),
+  receiverId: int("receiverId").notNull(),
+  content: text("content").notNull(), // This will be encrypted string `ZERO_TRACE:xxxx`
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const collaborations = mysqlTable("collaborations", {
+  id: int("id").autoincrement().primaryKey(),
+  initiatorId: int("initiatorId").notNull(),
+  targetId: int("targetId").notNull(),
+  status: mysqlEnum("status", ["pending", "accepted", "rejected"]).default("pending").notNull(),
+  message: text("message"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const tips = mysqlTable("tips", {
+  id: int("id").autoincrement().primaryKey(),
+  senderId: int("senderId").notNull(),
+  receiverId: int("receiverId").notNull(),
+  amount: int("amount").notNull(),
+  message: text("message"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const scheduledPosts = mysqlTable("scheduled_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  content: text("content").notNull(),
+  platforms: json("platforms").notNull(), // e.g. ["twitter", "onlyfans"]
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  status: mysqlEnum("status", ["pending", "published", "failed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const polls = mysqlTable("polls", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  question: varchar("question", { length: 512 }).notNull(),
+  options: json("options").notNull(), // e.g. ["Option A", "Option B"]
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const pollVotes = mysqlTable("poll_votes", {
+  id: int("id").autoincrement().primaryKey(),
+  pollId: int("pollId").notNull(),
+  userId: int("userId").notNull(),
+  optionIndex: int("optionIndex").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const expenses = mysqlTable("expenses", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  amount: int("amount").notNull(),
+  category: varchar("category", { length: 64 }).notNull(), // e.g. "props", "lighting"
+  description: text("description"),
+  date: timestamp("date").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DirectMessage = typeof directMessages.$inferSelect;
+export type Collaboration = typeof collaborations.$inferSelect;
+export type Tip = typeof tips.$inferSelect;
+export type ScheduledPost = typeof scheduledPosts.$inferSelect;
+export type Poll = typeof polls.$inferSelect;
+export type PollVote = typeof pollVotes.$inferSelect;
+export type Expense = typeof expenses.$inferSelect;

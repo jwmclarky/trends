@@ -433,3 +433,104 @@ export async function completeBounty(bountyId: number) {
   }).where(eq(bounties.id, bountyId));
   return result;
 }
+
+// ===== DIRECT MESSAGES =====
+export async function getDirectMessages(userId: number, otherUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { directMessages } = await import("../drizzle/schema");
+  return db.select().from(directMessages)
+    .where(
+      sql`(${directMessages.senderId} = ${userId} AND ${directMessages.receiverId} = ${otherUserId}) OR 
+          (${directMessages.senderId} = ${otherUserId} AND ${directMessages.receiverId} = ${userId})`
+    )
+    .orderBy(desc(directMessages.createdAt))
+    .limit(50);
+}
+export async function sendDirectMessage(senderId: number, receiverId: number, content: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { directMessages } = await import("../drizzle/schema");
+  return db.insert(directMessages).values({ senderId, receiverId, content });
+}
+
+// ===== COLLABORATIONS =====
+export async function getCollaborations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { collaborations } = await import("../drizzle/schema");
+  return db.select().from(collaborations)
+    .where(sql`${collaborations.initiatorId} = ${userId} OR ${collaborations.targetId} = ${userId}`);
+}
+export async function createCollaboration(initiatorId: number, targetId: number, message?: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { collaborations } = await import("../drizzle/schema");
+  return db.insert(collaborations).values({ initiatorId, targetId, message: message || null });
+}
+
+// ===== TIPS =====
+export async function getTipsLeaderboard() {
+  const db = await getDb();
+  if (!db) return [];
+  const { tips } = await import("../drizzle/schema");
+  const result = await db.select({
+    senderId: tips.senderId,
+    total: sql<number>`SUM(${tips.amount})`
+  }).from(tips).groupBy(tips.senderId).orderBy(desc(sql`SUM(${tips.amount})`)).limit(10);
+  return result;
+}
+export async function sendTip(senderId: number, receiverId: number, amount: number, message?: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { tips } = await import("../drizzle/schema");
+  return db.insert(tips).values({ senderId, receiverId, amount, message: message || null });
+}
+
+// ===== SCHEDULER =====
+export async function getScheduledPosts(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { scheduledPosts } = await import("../drizzle/schema");
+  return db.select().from(scheduledPosts).where(eq(scheduledPosts.userId, userId)).orderBy(desc(scheduledPosts.scheduledFor));
+}
+export async function createScheduledPost(userId: number, content: string, platforms: string[], scheduledFor: Date) {
+  const db = await getDb();
+  if (!db) return null;
+  const { scheduledPosts } = await import("../drizzle/schema");
+  return db.insert(scheduledPosts).values({ userId, content, platforms, scheduledFor });
+}
+
+// ===== POLLS =====
+export async function getPolls() {
+  const db = await getDb();
+  if (!db) return [];
+  const { polls } = await import("../drizzle/schema");
+  return db.select().from(polls).orderBy(desc(polls.createdAt)).limit(20);
+}
+export async function createPoll(userId: number, question: string, options: string[]) {
+  const db = await getDb();
+  if (!db) return null;
+  const { polls } = await import("../drizzle/schema");
+  return db.insert(polls).values({ userId, question, options });
+}
+export async function votePoll(userId: number, pollId: number, optionIndex: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const { pollVotes } = await import("../drizzle/schema");
+  return db.insert(pollVotes).values({ userId, pollId, optionIndex });
+}
+
+// ===== FINANCE =====
+export async function getExpenses(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { expenses } = await import("../drizzle/schema");
+  return db.select().from(expenses).where(eq(expenses.userId, userId)).orderBy(desc(expenses.date));
+}
+export async function createExpense(userId: number, amount: number, category: string, description?: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { expenses } = await import("../drizzle/schema");
+  return db.insert(expenses).values({ userId, amount, category, description: description || null });
+}

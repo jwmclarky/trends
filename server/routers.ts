@@ -288,6 +288,28 @@ export const appRouter = router({
         
         return { report: response.choices[0]?.message?.content || "Unable to generate bundle report." };
       }),
+    generateConcepts: publicProcedure
+      .input(z.object({
+        niche: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const prompt = `Generate 3 unique, highly trending content concepts or video scripts for an adult content creator specializing in the following niche/fetish: "${input.niche}". For each concept, provide: 1. A catchy title. 2. A brief scenario description. 3. Suggested tags/keywords for SEO. 4. A recommended outfit or prop list. Make the output professional, creative, and structured with markdown headings.`;
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: "You are the KinkMetrics AI Content Strategist. You help adult content creators brainstorm highly engaging, trending content ideas based on their specific niche. Provide detailed, creative scene concepts, scripts, and production tips. Structure your response with clear headings."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        });
+        
+        return { concepts: response.choices[0]?.message?.content || "Unable to generate concepts." };
+      }),
   }),
 
   infographic: router({
@@ -389,7 +411,85 @@ export const appRouter = router({
         return { success: true };
       })
   }),
-});
 
+  dm: router({
+    getMessages: protectedProcedure
+      .input(z.object({ otherUserId: z.number() }))
+      .query(({ ctx, input }) => db.getDirectMessages(ctx.user.id, input.otherUserId)),
+    sendMessage: protectedProcedure
+      .input(z.object({ receiverId: z.number(), content: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.sendDirectMessage(ctx.user.id, input.receiverId, input.content);
+        return { success: true };
+      })
+  }),
+
+  collab: router({
+    getAll: protectedProcedure.query(({ ctx }) => db.getCollaborations(ctx.user.id)),
+    create: protectedProcedure
+      .input(z.object({ targetId: z.number(), message: z.string().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createCollaboration(ctx.user.id, input.targetId, input.message);
+        return { success: true };
+      })
+  }),
+
+  tips: router({
+    getLeaderboard: publicProcedure.query(() => db.getTipsLeaderboard()),
+    send: protectedProcedure
+      .input(z.object({ receiverId: z.number(), amount: z.number(), message: z.string().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.sendTip(ctx.user.id, input.receiverId, input.amount, input.message);
+        return { success: true };
+      })
+  }),
+
+  scheduler: router({
+    getAll: protectedProcedure.query(({ ctx }) => db.getScheduledPosts(ctx.user.id)),
+    create: protectedProcedure
+      .input(z.object({ content: z.string(), platforms: z.array(z.string()), scheduledFor: z.date() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createScheduledPost(ctx.user.id, input.content, input.platforms, input.scheduledFor);
+        return { success: true };
+      })
+  }),
+
+  polls: router({
+    getAll: publicProcedure.query(() => db.getPolls()),
+    create: protectedProcedure
+      .input(z.object({ question: z.string(), options: z.array(z.string()) }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createPoll(ctx.user.id, input.question, input.options);
+        return { success: true };
+      }),
+    vote: protectedProcedure
+      .input(z.object({ pollId: z.number(), optionIndex: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.votePoll(ctx.user.id, input.pollId, input.optionIndex);
+        return { success: true };
+      })
+  }),
+
+  finance: router({
+    getExpenses: protectedProcedure.query(({ ctx }) => db.getExpenses(ctx.user.id)),
+    createExpense: protectedProcedure
+      .input(z.object({ amount: z.number(), category: z.string(), description: z.string().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createExpense(ctx.user.id, input.amount, input.category, input.description);
+        return { success: true };
+      })
+  }),
+
+  dmca: router({
+    scan: protectedProcedure
+      .input(z.object({ username: z.string() }))
+      .mutation(async ({ input }) => {
+        return [
+          { url: `https://fake-tube.com/video/${input.username}-leak`, status: "Detected" },
+          { url: `https://pirate-bay-clone.net/search/${input.username}`, status: "Takedown Sent" }
+        ];
+      })
+  }),
+});
 
 export type AppRouter = typeof appRouter;
