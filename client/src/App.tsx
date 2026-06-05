@@ -25,6 +25,7 @@ import Sandbox from "./pages/Sandbox";
 import Synergy from "./pages/Synergy";
 import Legality from "./pages/Legality";
 import BountyBoard from "./pages/BountyBoard";
+import RopeStudio from "./pages/RopeStudio";
 
 
 function Router() {
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/synergy" component={Synergy} />
       <Route path="/legality" component={Legality} />
       <Route path="/bounties" component={BountyBoard} />
+      <Route path="/rope-studio" component={RopeStudio} />
       <Route path="/kink-matcher" component={KinkMatcher} />
       <Route path="/vault" component={Vault} />
       <Route path="/blog" component={Blog} />
