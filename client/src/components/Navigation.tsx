@@ -28,6 +28,7 @@ export default function Navigation() {
     { href: "/legality", label: "Compliance Radar", icon: Scale },
     { href: "/bounties", label: "Bounty Board", icon: Briefcase },
     { href: "/rope-studio", label: "Rope Studio", icon: Activity },
+    { href: "/platform-matrix", label: "Platform Matrix", icon: GitCompare },
     { href: "/forum", label: "Forum", icon: Users },
     { href: "/chat", label: "Chat", icon: MessageCircle },
   ];
