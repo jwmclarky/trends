@@ -123,7 +123,21 @@ export const vaultComments = mysqlTable("vault_comments", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const bounties = mysqlTable("bounties", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 256 }).notNull(),
+  description: text("description").notNull(),
+  kink: varchar("kink", { length: 128 }).notNull(),
+  budget: int("budget").notNull(),
+  status: varchar("status", { length: 32 }).default("open").notNull(), // "open" | "applied" | "completed"
+  creatorId: int("creatorId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export type VaultMedia = typeof vaultMedia.$inferSelect;
 export type InsertVaultMedia = typeof vaultMedia.$inferInsert;
 export type VaultComment = typeof vaultComments.$inferSelect;
 export type InsertVaultComment = typeof vaultComments.$inferInsert;
+export type Bounty = typeof bounties.$inferSelect;
+export type InsertBounty = typeof bounties.$inferInsert;

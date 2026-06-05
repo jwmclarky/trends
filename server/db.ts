@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { eq, desc, and, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, trendData, articles, forumCategories, forumPosts, postVotes, chatMessages, notifications, vaultMedia, vaultComments } from "../drizzle/schema";
+import { InsertUser, users, trendData, articles, forumCategories, forumPosts, postVotes, chatMessages, notifications, vaultMedia, vaultComments, bounties } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -370,5 +370,66 @@ export async function createVaultComment(userId: number, data: { mediaId: number
     mediaId: data.mediaId,
     content: data.content,
   });
+  return result;
+}
+
+// ===== BOUNTIES =====
+export async function getBounties() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const list = await db.select().from(bounties).orderBy(desc(bounties.createdAt));
+
+  const enriched = await Promise.all(list.map(async (item) => {
+    const posterResult = await db.select({ name: users.name, avatarUrl: users.avatarUrl }).from(users).where(eq(users.id, item.userId)).limit(1);
+    let creatorName = "";
+    if (item.creatorId) {
+      const creatorResult = await db.select({ name: users.name }).from(users).where(eq(users.id, item.creatorId)).limit(1);
+      creatorName = creatorResult[0]?.name || "";
+    }
+    return { 
+      ...item, 
+      userName: posterResult[0]?.name || "Anonymous", 
+      userAvatar: posterResult[0]?.avatarUrl || "",
+      creatorName 
+    };
+  }));
+
+  return enriched;
+}
+
+export async function createBounty(userId: number, data: { title: string; description: string; kink: string; budget: number }) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(bounties).values({
+    userId,
+    title: data.title,
+    description: data.description,
+    kink: data.kink,
+    budget: data.budget,
+    status: "open"
+  });
+  return result;
+}
+
+export async function claimBounty(bountyId: number, creatorId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.update(bounties).set({
+    creatorId,
+    status: "applied"
+  }).where(eq(bounties.id, bountyId));
+  return result;
+}
+
+export async function completeBounty(bountyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.update(bounties).set({
+    status: "completed"
+  }).where(eq(bounties.id, bountyId));
   return result;
 }

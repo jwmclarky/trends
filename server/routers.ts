@@ -358,6 +358,37 @@ export const appRouter = router({
         return { success: true };
       })
   }),
+
+  bounty: router({
+    getAll: protectedProcedure.query(() => db.getBounties()),
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(3),
+        description: z.string().min(5),
+        kink: z.string(),
+        budget: z.number().min(5)
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createBounty(ctx.user.id, input);
+        return { success: true };
+      }),
+    claim: protectedProcedure
+      .input(z.object({
+        bountyId: z.number()
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.claimBounty(input.bountyId, ctx.user.id);
+        return { success: true };
+      }),
+    complete: protectedProcedure
+      .input(z.object({
+        bountyId: z.number()
+      }))
+      .mutation(async ({ input }) => {
+        await db.completeBounty(input.bountyId);
+        return { success: true };
+      })
+  }),
 });
 
 
