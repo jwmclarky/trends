@@ -8,8 +8,9 @@ import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { useParams } from "wouter";
 import { useState, useRef, useEffect } from "react";
-import { Camera, Save, User, Calendar, MessageCircle, BookOpen } from "lucide-react";
+import { Camera, Save, User, Calendar, MessageCircle, BookOpen, Lock, Unlock } from "lucide-react";
 import { toast } from "sonner";
+import { encryptText, decryptText } from "@/lib/crypto";
 
 export default function Profile() {
   const params = useParams<{ id?: string }>();
@@ -18,6 +19,12 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const isOwnProfile = !params.id || (user && params.id === String(user.id));
+  
+  // Zero-Trace Mode state
+  const [isZeroTrace, setIsZeroTrace] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [isEncryptedData, setIsEncryptedData] = useState(false);
+  const [unlockAttempt, setUnlockAttempt] = useState("");
 
   const { data: profile } = isOwnProfile
     ? trpc.profile.get.useQuery(undefined, { enabled: isAuthenticated })
@@ -25,8 +32,50 @@ export default function Profile() {
 
   // Sync bio from profile data
   useEffect(() => {
-    if (profile?.bio) setBio(profile.bio);
-  }, [profile?.bio]);
+    if (profile?.bio) {
+      if (profile.bio.startsWith("ZERO_TRACE:")) {
+        setIsEncryptedData(true);
+        if (passcode) {
+          decryptText(profile.bio.slice(11), passcode)
+            .then(dec => setBio(dec))
+            .catch(() => toast.error("Failed to decrypt profile with current passcode"));
+        } else {
+          setBio(""); // Will prompt for unlock
+        }
+      } else {
+        setBio(profile.bio);
+        setIsEncryptedData(false);
+        setIsZeroTrace(false);
+      }
+    }
+  }, [profile?.bio, passcode]);
+
+  const handleSaveBio = async () => {
+    let bioToSave = bio;
+    if (isZeroTrace) {
+      if (!passcode) {
+        toast.error("Passcode required for Zero-Trace mode");
+        return;
+      }
+      const encrypted = await encryptText(bio, passcode);
+      bioToSave = `ZERO_TRACE:${encrypted}`;
+    }
+    updateProfile.mutate({ bio: bioToSave });
+  };
+
+  const handleUnlock = async () => {
+    if (!profile?.bio?.startsWith("ZERO_TRACE:")) return;
+    try {
+      const dec = await decryptText(profile.bio.slice(11), unlockAttempt);
+      setBio(dec);
+      setPasscode(unlockAttempt);
+      setUnlockAttempt("");
+      setIsZeroTrace(true);
+      toast.success("Profile unlocked");
+    } catch {
+      toast.error("Incorrect passcode");
+    }
+  };
 
   const updateProfile = trpc.profile.update.useMutation({
     onSuccess: () => {
@@ -117,9 +166,52 @@ export default function Profile() {
 
               {/* Bio */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Bio</label>
-                {isEditing ? (
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium block">Bio</label>
+                  {isOwnProfile && isEditing && (
+                    <Button 
+                      size="sm" 
+                      variant={isZeroTrace ? "default" : "outline"}
+                      className={isZeroTrace ? "bg-primary text-primary-foreground gap-2" : "gap-2"}
+                      onClick={() => setIsZeroTrace(!isZeroTrace)}
+                    >
+                      {isZeroTrace ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                      Zero-Trace Mode
+                    </Button>
+                  )}
+                </div>
+
+                {!isEditing && isEncryptedData && !passcode ? (
+                  <div className="p-4 bg-secondary/50 rounded-lg space-y-3 border border-primary/20">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Lock className="w-5 h-5" />
+                      <p className="font-medium text-sm">This profile is cryptographically secured.</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input 
+                        type="password" 
+                        placeholder="Enter passcode to view..." 
+                        value={unlockAttempt}
+                        onChange={e => setUnlockAttempt(e.target.value)}
+                        className="bg-background max-w-[250px]"
+                      />
+                      <Button onClick={handleUnlock}>Decrypt</Button>
+                    </div>
+                  </div>
+                ) : isEditing ? (
                   <div className="space-y-3">
+                    {isZeroTrace && (
+                      <div className="p-3 bg-primary/10 border border-primary/30 rounded-md mb-3 flex flex-col gap-2">
+                        <p className="text-xs text-primary font-medium flex items-center gap-1"><Lock className="w-3 h-3"/> Encryption Passcode (will not be saved):</p>
+                        <Input 
+                          type="password" 
+                          placeholder="Passcode..." 
+                          value={passcode}
+                          onChange={e => setPasscode(e.target.value)}
+                          className="bg-background max-w-[250px]"
+                        />
+                      </div>
+                    )}
                     <Textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
@@ -127,7 +219,7 @@ export default function Profile() {
                       className="bg-secondary/50 min-h-[100px]"
                     />
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => updateProfile.mutate({ bio })} disabled={updateProfile.isPending} className="gap-2">
+                      <Button size="sm" onClick={handleSaveBio} disabled={updateProfile.isPending} className="gap-2">
                         <Save className="w-4 h-4" />
                         Save
                       </Button>
@@ -136,8 +228,10 @@ export default function Profile() {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-muted-foreground text-sm mb-2">{profile?.bio || "No bio yet"}</p>
-                    <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>Edit Bio</Button>
+                    <p className="text-muted-foreground text-sm mb-2">{bio || "No bio yet"}</p>
+                    {isOwnProfile && (
+                      <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>Edit Bio</Button>
+                    )}
                   </div>
                 )}
               </div>
