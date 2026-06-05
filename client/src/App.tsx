@@ -22,6 +22,7 @@ import KinkMatcher from "./pages/KinkMatcher";
 import Vault from "./pages/Vault";
 import Login from "./pages/Login";
 import Sandbox from "./pages/Sandbox";
+import Synergy from "./pages/Synergy";
 
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/sandbox" component={Sandbox} />
+      <Route path="/synergy" component={Synergy} />
       <Route path="/kink-matcher" component={KinkMatcher} />
       <Route path="/vault" component={Vault} />
       <Route path="/blog" component={Blog} />

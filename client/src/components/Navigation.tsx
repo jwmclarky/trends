@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
-import { BarChart3, BookOpen, MessageCircle, Users, TrendingUp, Menu, X, Download, Database, GitCompare, Wrench, BookMarked, Heart, Lock, Calculator } from "lucide-react";
+import { BarChart3, BookOpen, MessageCircle, Users, TrendingUp, Menu, X, Download, Database, GitCompare, Wrench, BookMarked, Heart, Lock, Calculator, Sparkles } from "lucide-react";
 import { useState } from "react";
 import NotificationBell from "@/components/NotificationBell";
 
@@ -24,6 +24,7 @@ export default function Navigation() {
   const memberLinks = [
     { href: "/vault", label: "Fetish Vault", icon: Lock },
     { href: "/sandbox", label: "Income Sandbox", icon: Calculator },
+    { href: "/synergy", label: "Synergy Predictor", icon: Sparkles },
     { href: "/forum", label: "Forum", icon: Users },
     { href: "/chat", label: "Chat", icon: MessageCircle },
   ];

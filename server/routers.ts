@@ -265,6 +265,29 @@ export const appRouter = router({
 
         return { answer: response.choices[0]?.message?.content || "Unable to generate analysis." };
       }),
+    getSynergyReport: protectedProcedure
+      .input(z.object({
+        kinks: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const kinksList = input.kinks.join(", ");
+        const prompt = `Develop a premium content bundle, cross-promotion strategy, and tagging plan for a creator targeting the following overlapping niches: ${kinksList}. Explain why these niches synergy, give 3 specific scene concepts combining them, list top tags, and suggest pricing models. Make it detailed, professional, and structured with clear markdown headings.`;
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: "You are the KinkMetrics AI Niche Synergy Planner. You help adult content creators cross-promote and bundle niche kink content to maximize subscriber growth and income. Provide detailed, creative scene ideas, marketing tips, and hashtag bundles. Structure your response with clear headings."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        });
+        
+        return { report: response.choices[0]?.message?.content || "Unable to generate bundle report." };
+      }),
   }),
 
   infographic: router({
