@@ -21,6 +21,7 @@ import ReadingList from "./pages/ReadingList";
 import KinkMatcher from "./pages/KinkMatcher";
 import Vault from "./pages/Vault";
 import Login from "./pages/Login";
+import Sandbox from "./pages/Sandbox";
 
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/sandbox" component={Sandbox} />
       <Route path="/kink-matcher" component={KinkMatcher} />
       <Route path="/vault" component={Vault} />
       <Route path="/blog" component={Blog} />
