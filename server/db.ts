@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { eq, desc, and, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, trendData, articles, forumCategories, forumPosts, postVotes, chatMessages, notifications } from "../drizzle/schema";
+import { InsertUser, users, trendData, articles, forumCategories, forumPosts, postVotes, chatMessages, notifications, vaultMedia, vaultComments } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -55,6 +55,13 @@ export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -301,4 +308,67 @@ export async function markAllNotificationsRead(userId: number) {
     .update(notifications)
     .set({ isRead: true })
     .where(eq(notifications.userId, userId));
+}
+
+// ===== VAULT =====
+export async function getVaultMedia(fetish?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [];
+  if (fetish && fetish !== "all") {
+    conditions.push(eq(vaultMedia.fetish, fetish));
+  }
+
+  const mediaList = conditions.length > 0 
+    ? await db.select().from(vaultMedia).where(and(...conditions)).orderBy(desc(vaultMedia.createdAt))
+    : await db.select().from(vaultMedia).orderBy(desc(vaultMedia.createdAt));
+
+  const enriched = await Promise.all(mediaList.map(async (media) => {
+    const userResult = await db.select({ name: users.name, avatarUrl: users.avatarUrl }).from(users).where(eq(users.id, media.userId)).limit(1);
+    return { ...media, userName: userResult[0]?.name || "Anonymous", userAvatar: userResult[0]?.avatarUrl || "" };
+  }));
+
+  return enriched;
+}
+
+export async function createVaultMedia(userId: number, data: { fetish: string; title: string; description?: string; fileUrl: string; fileType: string }) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(vaultMedia).values({
+    userId,
+    fetish: data.fetish,
+    title: data.title,
+    description: data.description || null,
+    fileUrl: data.fileUrl,
+    fileType: data.fileType,
+  });
+  return result;
+}
+
+export async function getVaultComments(mediaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const comments = await db.select().from(vaultComments).where(eq(vaultComments.mediaId, mediaId)).orderBy(vaultComments.createdAt);
+
+  const enriched = await Promise.all(comments.map(async (comment) => {
+    const userResult = await db.select({ name: users.name, avatarUrl: users.avatarUrl }).from(users).where(eq(users.id, comment.userId)).limit(1);
+    return { ...comment, userName: userResult[0]?.name || "Anonymous", userAvatar: userResult[0]?.avatarUrl || "" };
+  }));
+
+  return enriched;
+}
+
+export async function createVaultComment(userId: number, data: { mediaId: number; content: string }) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(vaultComments).values({
+    userId,
+    mediaId: data.mediaId,
+    content: data.content,
+  });
+  return result;
 }

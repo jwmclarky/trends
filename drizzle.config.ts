@@ -9,6 +9,7 @@ export default defineConfig({
   schema: "./drizzle/schema.ts",
   out: "./drizzle",
   dialect: "mysql",
+  tablesFilter: ["users"],
   dbCredentials: {
     url: connectionString,
   },

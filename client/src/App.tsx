@@ -18,12 +18,19 @@ import Compare from "./pages/Compare";
 import Toolkit from "./pages/Toolkit";
 import ToolkitTool from "./pages/ToolkitTool";
 import ReadingList from "./pages/ReadingList";
+import KinkMatcher from "./pages/KinkMatcher";
+import Vault from "./pages/Vault";
+import Login from "./pages/Login";
+
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/kink-matcher" component={KinkMatcher} />
+      <Route path="/vault" component={Vault} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogArticle} />
       <Route path="/profile" component={Profile} />

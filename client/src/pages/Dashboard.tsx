@@ -8,6 +8,7 @@ import { useState, useMemo } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
 import { TrendingUp, Globe, Filter, Sparkles, Send, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import CyberMap from "@/components/CyberMap";
 
 const CHART_COLORS = ["oklch(0.72 0.18 330)", "oklch(0.65 0.2 280)", "oklch(0.7 0.15 200)", "oklch(0.75 0.12 80)", "oklch(0.6 0.18 150)", "#f472b6", "#a78bfa", "#34d399"];
 
@@ -88,6 +89,26 @@ export default function Dashboard() {
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Trend Dashboard</h1>
             <p className="text-muted-foreground">Interactive exploration of global fetish and kink data</p>
           </div>
+
+          {/* Geographic Cyber Map Node Grid */}
+          <Card className="glass-card mb-8">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg font-bold">
+                <Globe className="w-5 h-5 text-primary" />
+                Geographic Cyber Map Grid
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Hover over nodes to see curiosity indices, and click a hotspot to filter the dashboard by country.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <CyberMap
+                selectedCountry={country}
+                onSelectCountry={(code) => setCountry(code)}
+                selectedFetish={barData[0]?.fullName || "cuckold"}
+              />
+            </CardContent>
+          </Card>
 
           {/* Filters */}
           <Card className="glass-card mb-8">

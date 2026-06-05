@@ -9,6 +9,7 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   bio: text("bio"),
   avatarUrl: text("avatarUrl"),
+  passwordHash: text("passwordHash"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -102,3 +103,27 @@ export type Article = typeof articles.$inferSelect;
 export type ForumPost = typeof forumPosts.$inferSelect;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+
+export const vaultMedia = mysqlTable("vault_media", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  fetish: varchar("fetish", { length: 64 }).notNull(),
+  title: varchar("title", { length: 256 }).notNull(),
+  description: text("description"),
+  fileUrl: text("fileUrl").notNull(),
+  fileType: varchar("fileType", { length: 32 }).notNull(), // "image" | "video"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const vaultComments = mysqlTable("vault_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  mediaId: int("mediaId").notNull(),
+  userId: int("userId").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VaultMedia = typeof vaultMedia.$inferSelect;
+export type InsertVaultMedia = typeof vaultMedia.$inferInsert;
+export type VaultComment = typeof vaultComments.$inferSelect;
+export type InsertVaultComment = typeof vaultComments.$inferInsert;

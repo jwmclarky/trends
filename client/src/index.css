@@ -198,3 +198,46 @@
   75% { transform: rotate(-3deg); }
   90% { transform: rotate(3deg); }
 }
+
+/* Custom Cyber Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 11, 22, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.72 0.18 330 / 30%);
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.2 280 / 65%);
+}
+
+/* Scrollbar None Utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Neon Glow Animations & Borders */
+.glow-border-pink:hover {
+  border-color: oklch(0.65 0.2 280 / 40%);
+  box-shadow: 0 0 15px oklch(0.65 0.2 280 / 15%);
+}
+
+.glow-border-purple:hover {
+  border-color: oklch(0.72 0.18 330 / 40%);
+  box-shadow: 0 0 15px oklch(0.72 0.18 330 / 15%);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 8px oklch(0.7 0.15 200 / 50%);
+}
+
